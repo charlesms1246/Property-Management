@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+
+{% block title %}Maintenance Request - {{ request.property.name }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ url_for('properties.list_properties') }}">Properties</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('properties.view_property', property_id=request.property.id) }}">{{ request.property.name }}</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Maintenance Request</li>
+        </ol>
+    </nav>
+
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Maintenance Request Details</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <p><strong>Property:</strong> {{ request.property.name }}</p>
+                            <p><strong>Submitted By:</strong> {{ request.tenant.name }}</p>
+                            <p><strong>Submitted On:</strong> {{ request.created_at.strftime('%Y-%m-%d') }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <p><strong>Status:</strong> 
+                                <span class="badge {% if request.status == 'completed' %}bg-success
+                                                  {% elif request.status == 'in_progress' %}bg-warning
+                                                  {% else %}bg-danger{% endif %}">
+                                    {{ request.status|title }}
+                                </span>
+                            </p>
+                            <p><strong>Priority:</strong> 
+                                <span class="badge {% if request.priority == 'high' %}bg-danger
+                                                  {% elif request.priority == 'medium' %}bg-warning
+                                                  {% else %}bg-info{% endif %}">
+                                    {{ request.priority|title }}
+                                </span>
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <h6>Description</h6>
+                        <p>{{ request.description }}</p>
+                    </div>
+
+                    <form method="POST" action="{{ url_for('maintenance.update_request', request_id=request.id) }}">
+                        <div class="mb-3">
+                            <label for="status" class="form-label">Update Status</label>
+                            <select class="form-select" id="status" name="status" required>
+                                <option value="pending" {% if request.status == 'pending' %}selected{% endif %}>Pending</option>
+                                <option value="in_progress" {% if request.status == 'in_progress' %}selected{% endif %}>In Progress</option>
+                                <option value="completed" {% if request.status == 'completed' %}selected{% endif %}>Completed</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="notes" class="form-label">Notes</label>
+                            <textarea class="form-control" id="notes" name="notes" rows="3">{{ request.notes or '' }}</textarea>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i> Update Request
+                            </button>
+                            <a href="{{ url_for('properties.view_property', property_id=request.property.id) }}" class="btn btn-outline-secondary">
+                                <i class="fas fa-arrow-left"></i> Back to Property
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

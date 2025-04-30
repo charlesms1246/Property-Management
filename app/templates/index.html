@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block title %}Welcome - Property Management{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center align-items-center min-vh-100">
+        <div class="col-md-8 text-center">
+            <h1 class="display-4 mb-4">Property Management System</h1>
+            <p class="lead mb-4">
+                A comprehensive solution for managing your properties, tenants, and maintenance requests.
+            </p>
+            <div class="d-grid gap-3 d-sm-flex justify-content-sm-center">
+                <a href="{{ url_for('auth.login') }}" class="btn btn-primary btn-lg px-4 gap-3">
+                    <i class="bi bi-box-arrow-in-right"></i> Login
+                </a>
+                <a href="{{ url_for('auth.register') }}" class="btn btn-outline-secondary btn-lg px-4">
+                    <i class="bi bi-person-plus"></i> Register
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

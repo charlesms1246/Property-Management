@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+
+{% block title %}Add Maintenance Request - {{ property.name }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ url_for('properties.list_properties') }}">Properties</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('properties.view_property', property_id=property.id) }}">{{ property.name }}</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Add Maintenance</li>
+        </ol>
+    </nav>
+
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Add Maintenance Request</h5>
+                </div>
+                <div class="card-body">
+                    <form method="POST">
+                        <div class="mb-3">
+                            <label for="tenant_id" class="form-label">Tenant</label>
+                            <select class="form-select" id="tenant_id" name="tenant_id" required>
+                                <option value="">Select a tenant</option>
+                                {% for tenant in property.tenants %}
+                                <option value="{{ tenant.id }}">{{ tenant.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="title" class="form-label">Title</label>
+                            <input type="text" class="form-control" id="title" name="title" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="description" class="form-label">Description</label>
+                            <textarea class="form-control" id="description" name="description" rows="4" required></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label for="priority" class="form-label">Priority</label>
+                            <select class="form-select" id="priority" name="priority" required>
+                                <option value="low">Low</option>
+                                <option value="medium" selected>Medium</option>
+                                <option value="high">High</option>
+                            </select>
+                        </div>
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i> Submit Request
+                            </button>
+                            <a href="{{ url_for('properties.view_property', property_id=property.id) }}" 
+                               class="btn btn-outline-secondary">
+                                <i class="fas fa-times"></i> Cancel
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

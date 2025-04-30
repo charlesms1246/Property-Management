@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Tenant - {{ tenant.name }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ url_for('tenants.list_tenants') }}">Tenants</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('tenants.view_tenant', tenant_id=tenant.id) }}">{{ tenant.name }}</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Edit</li>
+        </ol>
+    </nav>
+
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Edit Tenant Details</h5>
+                </div>
+                <div class="card-body">
+                    <form method="POST">
+                        <div class="mb-3">
+                            <label for="name" class="form-label">Name</label>
+                            <input type="text" class="form-control" id="name" name="name" value="{{ tenant.name }}" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Email</label>
+                            <input type="email" class="form-control" id="email" name="email" value="{{ tenant.email }}" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="phone" class="form-label">Phone</label>
+                            <input type="tel" class="form-control" id="phone" name="phone" value="{{ tenant.phone }}" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="property_id" class="form-label">Property</label>
+                            <select class="form-select" id="property_id" name="property_id" required>
+                                {% for property in properties %}
+                                    <option value="{{ property.id }}" {% if property.id == tenant.property_id %}selected{% endif %}>
+                                        {{ property.name }} - {{ property.address }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="lease_start" class="form-label">Lease Start Date</label>
+                            <input type="date" class="form-control" id="lease_start" name="lease_start" 
+                                   value="{{ tenant.lease_start.strftime('%Y-%m-%d') }}" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="lease_end" class="form-label">Lease End Date</label>
+                            <input type="date" class="form-control" id="lease_end" name="lease_end" 
+                                   value="{{ tenant.lease_end.strftime('%Y-%m-%d') }}" required>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i> Save Changes
+                            </button>
+                            <a href="{{ url_for('tenants.view_tenant', tenant_id=tenant.id) }}" class="btn btn-outline-secondary">
+                                <i class="fas fa-times"></i> Cancel
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

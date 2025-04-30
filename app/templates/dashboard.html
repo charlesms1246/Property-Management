@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - Property Management{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <h1 class="h2 mb-4">Dashboard</h1>
+    
+    <!-- Financial Summary Cards -->
+    <div class="row mb-4">
+        {% for property in financial_summary %}
+        <div class="col-md-4 mb-3">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">{{ property.property_name }}</h5>
+                    <div class="row">
+                        <div class="col-6">
+                            <p class="mb-1">Monthly Rent</p>
+                            <h4>${{ "%.2f"|format(property.rent_amount) }}</h4>
+                        </div>
+                        <div class="col-6">
+                            <p class="mb-1">Total Paid</p>
+                            <h4>${{ "%.2f"|format(property.total_paid) }}</h4>
+                        </div>
+                    </div>
+                    <div class="mt-2">
+                        <span class="badge bg-{{ 'success' if property.late_payments == 0 else 'warning' }}">
+                            {{ property.late_payments }} Late Payments
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Maintenance Requests -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Recent Maintenance Requests</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Property</th>
+                                    <th>Title</th>
+                                    <th>Status</th>
+                                    <th>Date</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for request in maintenance_requests %}
+                                <tr>
+                                    <td>{{ request.property_name }}</td>
+                                    <td>{{ request.title }}</td>
+                                    <td>
+                                        <span class="badge bg-{{ 
+                                            'success' if request.status == 'completed' else 
+                                            'warning' if request.status == 'in_progress' else 
+                                            'danger' 
+                                        }}">
+                                            {{ request.status }}
+                                        </span>
+                                    </td>
+                                    <td>{{ request.created_at.strftime('%Y-%m-%d') }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

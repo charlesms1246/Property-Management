@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+
+{% block title %}{{ tenant.name }} - Property Management{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ url_for('properties.list_properties') }}">Properties</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('properties.view_property', property_id=tenant.property.id) }}">{{ tenant.property.name }}</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ tenant.name }}</li>
+        </ol>
+    </nav>
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>{{ tenant.name }}</h1>
+        <div class="btn-group">
+            <a href="{{ url_for('tenants.edit_tenant', tenant_id=tenant.id) }}" class="btn btn-outline-primary">
+                <i class="fas fa-edit"></i> Edit Tenant
+            </a>
+            <a href="{{ url_for('tenants.add_payment', tenant_id=tenant.id) }}" class="btn btn-outline-success">
+                <i class="fas fa-money-bill"></i> Add Payment
+            </a>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Tenant Details -->
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Tenant Details</h5>
+                </div>
+                <div class="card-body">
+                    <p><strong>Email:</strong> {{ tenant.email }}</p>
+                    <p><strong>Phone:</strong> {{ tenant.phone }}</p>
+                    <p><strong>Property:</strong> {{ tenant.property.name }}</p>
+                    <p><strong>Address:</strong> {{ tenant.property.address }}</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Lease Details -->
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Lease Details</h5>
+                </div>
+                <div class="card-body">
+                    <p><strong>Start Date:</strong> {{ tenant.lease_start.strftime('%Y-%m-%d') }}</p>
+                    <p><strong>End Date:</strong> {{ tenant.lease_end.strftime('%Y-%m-%d') }}</p>
+                    <p><strong>Monthly Rent:</strong> ${{ "%.2f"|format(tenant.property.rent_amount) }}</p>
+                    <p><strong>Status:</strong> 
+                        <span class="badge {% if tenant.lease_end < now %}bg-danger{% else %}bg-success{% endif %}">
+                            {{ 'Active' if tenant.lease_end > now else 'Expired' }}
+                        </span>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Rent Payments -->
+    <div class="card">
+        <div class="card-header">
+            <h5 class="card-title mb-0">Rent Payment History</h5>
+        </div>
+        <div class="card-body">
+            {% if tenant.rent_payments %}
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Amount</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for payment in tenant.rent_payments %}
+                                <tr>
+                                    <td>{{ payment.payment_date.strftime('%Y-%m-%d') }}</td>
+                                    <td>${{ "%.2f"|format(payment.amount) }}</td>
+                                    <td>
+                                        <span class="badge {% if payment.status == 'paid' %}bg-success{% elif payment.status == 'pending' %}bg-warning{% else %}bg-danger{% endif %}">
+                                            {{ payment.status }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <a href="{{ url_for('tenants.view_payment', payment_id=payment.id) }}" 
+                                           class="btn btn-sm btn-outline-primary">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <p class="text-muted">No rent payments recorded for this tenant.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %} 

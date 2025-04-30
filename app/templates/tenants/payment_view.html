@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block title %}Payment Details - {{ payment.tenant.name }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ url_for('tenants.list_tenants') }}">Tenants</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('tenants.view_tenant', tenant_id=payment.tenant.id) }}">{{ payment.tenant.name }}</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Payment Details</li>
+        </ol>
+    </nav>
+
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Payment Details</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <p><strong>Tenant:</strong> {{ payment.tenant.name }}</p>
+                            <p><strong>Property:</strong> {{ payment.tenant.property.name }}</p>
+                            <p><strong>Payment Date:</strong> {{ payment.payment_date.strftime('%Y-%m-%d') }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <p><strong>Monthly Rent:</strong> ${{ "%.2f"|format(payment.tenant.property.rent_amount) }}</p>
+                            <p><strong>Late Fee:</strong> ${{ "%.2f"|format(payment.amount - payment.tenant.property.rent_amount) }}</p>
+                            <p><strong>Total Amount:</strong> ${{ "%.2f"|format(payment.amount) }}</p>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <p><strong>Status:</strong> 
+                            <span class="badge {% if payment.status == 'paid' %}bg-success{% else %}bg-danger{% endif %}">
+                                {{ payment.status|title }}
+                            </span>
+                        </p>
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        <a href="{{ url_for('tenants.view_tenant', tenant_id=payment.tenant.id) }}" class="btn btn-outline-primary">
+                            <i class="fas fa-arrow-left"></i> Back to Tenant
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

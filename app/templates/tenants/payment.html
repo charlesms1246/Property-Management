@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+
+{% block title %}Add Payment - {{ tenant.name }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ url_for('tenants.list_tenants') }}">Tenants</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('tenants.view_tenant', tenant_id=tenant.id) }}">{{ tenant.name }}</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Add Payment</li>
+        </ol>
+    </nav>
+
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Add Rent Payment</h5>
+                </div>
+                <div class="card-body">
+                    <form method="POST">
+                        <div class="mb-3">
+                            <label for="payment_date" class="form-label">Payment Date</label>
+                            <input type="date" class="form-control" id="payment_date" name="payment_date" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Monthly Rent</label>
+                            <input type="text" class="form-control" value="${{ "%.2f"|format(tenant.property.rent_amount) }}" readonly>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Late Fee</label>
+                            <input type="text" class="form-control" id="late_fee" readonly>
+                            <small class="text-muted">Late fees are calculated automatically based on payment date</small>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Total Amount</label>
+                            <input type="text" class="form-control" id="total_amount" readonly>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i> Record Payment
+                            </button>
+                            <a href="{{ url_for('tenants.view_tenant', tenant_id=tenant.id) }}" class="btn btn-outline-secondary">
+                                <i class="fas fa-times"></i> Cancel
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block scripts %}
+<script>
+document.getElementById('payment_date').addEventListener('change', function() {
+    const paymentDate = new Date(this.value);
+    const leaseStart = new Date('{{ tenant.lease_start.strftime("%Y-%m-%d") }}');
+    const daysLate = Math.max(0, Math.floor((paymentDate - leaseStart) / (1000 * 60 * 60 * 24)) % 30 - 1);
+    const lateFee = daysLate * 50; // $50 per day late fee
+    const monthlyRent = {{ tenant.property.rent_amount }};
+    const totalAmount = monthlyRent + lateFee;
+
+    document.getElementById('late_fee').value = '$' + lateFee.toFixed(2);
+    document.getElementById('total_amount').value = '$' + totalAmount.toFixed(2);
+});
+</script>
+{% endblock %}
+{% endblock %} 

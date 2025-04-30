@@ -1,0 +1,131 @@
+@startuml Property Management System ER Diagram
+
+' Hide the spot
+hide circle
+
+' Avoid problems with angled crows feet
+skinparam linetype ortho
+
+' Define entities
+entity "User" as user {
+  + id : INTEGER <<PK>>
+  --
+  username : VARCHAR(64) <<UK>>
+  email : VARCHAR(120) <<UK>>
+  password_hash : VARCHAR(128)
+  created_at : TIMESTAMP
+}
+
+entity "Property" as property {
+  + id : INTEGER <<PK>>
+  --
+  name : VARCHAR(100)
+  address : TEXT
+  type : VARCHAR(20) <<ENUM>> <<house,apartment,commercial>>
+  status : VARCHAR(20) <<ENUM>> <<vacant,occupied>>
+  rent_amount : DECIMAL(10,2)
+  owner_id : INTEGER <<FK>> references User
+  created_at : TIMESTAMP
+}
+
+entity "Tenant" as tenant {
+  + id : INTEGER <<PK>>
+  --
+  name : VARCHAR(100)
+  email : VARCHAR(120)
+  phone : VARCHAR(20)
+  property_id : INTEGER <<FK>> references Property
+  lease_start : DATE
+  lease_end : DATE
+  created_at : TIMESTAMP
+}
+
+entity "Maintenance Request" as maintenance {
+  + id : INTEGER <<PK>>
+  --
+  property_id : INTEGER <<FK>> references Property
+  tenant_id : INTEGER <<FK>> references Tenant
+  title : VARCHAR(100)
+  description : TEXT
+  status : VARCHAR(20) <<ENUM>> <<pending,in_progress,completed>>
+  priority : VARCHAR(20) <<ENUM>> <<low,medium,high>>
+  created_at : TIMESTAMP
+  completed_at : TIMESTAMP
+  notes : TEXT
+}
+
+entity "Rent Payment" as payment {
+  + id : INTEGER <<PK>>
+  --
+  tenant_id : INTEGER <<FK>> references Tenant
+  amount : DECIMAL(10,2)
+  payment_date : DATE
+  status : VARCHAR(20) <<ENUM>> <<pending,paid,late>>
+  created_at : TIMESTAMP
+}
+
+' Define relationships
+user ||--o{ property : "owns"
+property ||--o{ tenant : "has"
+tenant ||--o{ maintenance : "submits"
+tenant ||--o{ payment : "makes"
+property ||--o{ maintenance : "has"
+
+' Add detailed notes for views
+note right of user
+  <b>Views:</b>
+  <u>property_financial_summary</u>
+  - Aggregates financial data for properties
+  - Shows total tenants, paid amounts, late payments
+  - Used for financial reporting
+
+  <u>maintenance_history</u>
+  - Tracks maintenance request history
+  - Includes property and tenant details
+  - Used for maintenance reporting
+end note
+
+' Add detailed notes for triggers
+note right of property
+  <b>Triggers:</b>
+  <u>update_property_status</u>
+  - Automatically updates property status
+  - Triggered on tenant changes
+  - Sets to 'occupied' or 'vacant'
+
+  <u>maintenance_request_timestamp</u>
+  - Updates timestamps automatically
+  - Tracks request lifecycle
+  - Maintains audit trail
+end note
+
+' Add detailed notes for functions
+note right of tenant
+  <b>Functions:</b>
+  <u>calculate_late_fee</u>
+  - Input: days_late, rent_amount
+  - Calculates fee based on delay
+  - Progressive fee structure
+
+  <u>get_lease_status</u>
+  - Input: lease_start, lease_end
+  - Returns: upcoming/active/expired
+  - Used for lease management
+end note
+
+' Add notes for indexes
+note bottom of property
+  <b>Indexes:</b>
+  - idx_property_owner (owner_id)
+  - idx_property_status (status)
+  - idx_tenant_property (property_id)
+  - idx_tenant_lease (lease_start, lease_end)
+  - idx_maintenance_property (property_id)
+  - idx_maintenance_status (status)
+  - idx_maintenance_priority (priority)
+  - idx_payment_tenant (tenant_id)
+  - idx_payment_status (status)
+  - idx_payment_date (payment_date)
+end note
+
+@enduml 
